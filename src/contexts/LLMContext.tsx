@@ -16,7 +16,7 @@ interface LLMContextType {
 
 const defaultConfig: LLMConfig = {
   apiKey: '',
-  model: 'gemini-pro',
+  model: 'gemini-2.5-flash',
   isConnected: false,
 };
 

@@ -124,12 +124,16 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     // Save user message to Firebase
     await saveMessageToFirebase(userMessage);
 
+    console.log('💭 [CHAT] Preparando mensagem...');
+    console.log('📨 [CHAT] Conteúdo:', content.substring(0, 50) + '...');
+    console.log('🔑 [CHAT] Usando API Key:', hasApiKey ? 'SIM' : 'NÃO (modo mock)');
+    
     setIsLoading(true);
     setError(null);
 
     try {
       const requestPayload = {
-        model: hasApiKey ? 'gemini-pro' : 'gpt-4o-mini',
+        model: hasApiKey ? 'gemini-2.5-flash' : 'gpt-4o-mini',
         messages: [
           {
             role: 'system' as const,
@@ -139,13 +143,19 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
           { role: 'user' as const, content: content.trim() },
         ],
         temperature: 0.3,
-        max_tokens: 600,
+        max_tokens: 2000,
       };
 
+      console.log('📡 [CHAT] Enviando para API...');
+      console.log('📋 [CHAT] Payload:', { model: requestPayload.model, temperature: requestPayload.temperature, max_tokens: requestPayload.max_tokens });
+      
       // Usar API real do Gemini se tiver API Key, senão usar mock
       const response = hasApiKey 
         ? await geminiAPI(config.apiKey, requestPayload)
         : await mockOpenAI(requestPayload);
+
+      console.log('✅ [CHAT] Resposta recebida com sucesso');
+      console.log('📝 [CHAT] ID da resposta:', response.id);
 
       const assistantMessage: Message = {
         id: response.id,
@@ -154,12 +164,22 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         createdAt: Date.now(),
       };
 
+      console.log('💬 [CHAT] Tamanho da resposta:', assistantMessage.content.length, 'caracteres');
+      console.log('💾 [CHAT] Salvando no Firebase...');
+      
       // Save assistant response to Firebase
       await saveMessageToFirebase(assistantMessage);
+      
+      console.log('✅ [CHAT] Mensagem salva no Firebase');
     } catch (err: any) {
+      console.error('❌ [CHAT] Erro ao processar mensagem');
+      console.error('🔴 [CHAT] Tipo:', err.name);
+      console.error('🔴 [CHAT] Mensagem:', err.message);
+      console.error('🔴 [CHAT] Stack:', err.stack?.substring(0, 200));
+      
       const errorMessage = err.message || 'Falha ao obter resposta. Tente novamente.';
       setError(errorMessage);
-      console.error('Chat error:', err);
+      console.error('🔴 [CHAT] Mensagem de erro exibida:', errorMessage);
     } finally {
       setIsLoading(false);
     }

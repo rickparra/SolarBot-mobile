@@ -161,7 +161,7 @@ const LLMPanel = ({ visible, onClose }: LLMPanelProps) => {
               Informações do Modelo
             </Text>
             {[
-              { label: 'Modelo', value: hasApiKey ? 'gemini-pro' : 'mock' },
+              { label: 'Modelo', value: hasApiKey ? 'gemini-2.5-flash' : 'mock' },
               { label: 'Temperature', value: '0.3' },
               { label: 'Max tokens', value: '600' },
               { label: 'Provider', value: hasApiKey ? 'Google AI' : 'Local' },

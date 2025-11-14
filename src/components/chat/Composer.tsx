@@ -13,16 +13,29 @@ const Composer = ({ onOpenSettings }: ComposerProps) => {
   const [input, setInput] = useState('');
   const { sendMessage, isLoading, error } = useChat();
   const { hasApiKey } = useLLM();
+  
+  console.log('🎨 [COMPOSER] Renderizando componente');
+  console.log('📊 [COMPOSER] Estado:', { hasApiKey, isLoading, hasError: !!error });
 
   const handleSubmit = async () => {
-    if (!input.trim() || isLoading) return;
+    console.log('📝 [COMPOSER] handleSubmit chamado');
+    console.log('📊 [COMPOSER] Input length:', input.length);
+    console.log('🔒 [COMPOSER] isLoading:', isLoading);
+    
+    if (!input.trim() || isLoading) {
+      console.log('⚠️ [COMPOSER] Submit cancelado - input vazio ou loading');
+      return;
+    }
 
     const message = input.trim();
+    console.log('✉️ [COMPOSER] Enviando mensagem:', message.substring(0, 50) + '...');
     setInput('');
     
     try {
       await sendMessage(message);
+      console.log('✅ [COMPOSER] Mensagem enviada com sucesso');
     } catch (err) {
+      console.error('❌ [COMPOSER] Erro ao enviar:', err);
       Alert.alert('Erro', 'Falha ao enviar mensagem. Tente novamente.');
     }
   };

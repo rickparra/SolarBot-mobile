@@ -30,14 +30,18 @@ export const geminiAPI = async (
   apiKey: string,
   request: ChatCompletionRequest
 ): Promise<ChatCompletionResponse> => {
+  console.log('🔑 [GEMINI API] Iniciando chamada...');
+  console.log('📝 [GEMINI API] API Key:', apiKey ? `${apiKey.substring(0, 10)}...` : 'VAZIA');
+  
   if (!apiKey || apiKey.trim().length === 0) {
     throw new Error('API Key do Gemini não configurada');
   }
 
   try {
+    console.log('🤖 [GEMINI API] Inicializando modelo: gemini-2.5-flash');
     // Inicializar o cliente do Gemini
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
     // Converter mensagens para o formato do Gemini
     // O Gemini não usa system messages da mesma forma, então vamos incluir no contexto
@@ -71,15 +75,20 @@ export const geminiAPI = async (
         ).join('\n')}\n\nPergunta atual:\n${lastUserMessage}`
       : `${systemMessage}\n\n${lastUserMessage}`;
 
+    console.log('💬 [GEMINI API] Tamanho do prompt:', promptToSend.length, 'caracteres');
+    
     // Configurar parâmetros de geração
     const generationConfig = {
       temperature: request.temperature || 0.3,
-      maxOutputTokens: request.max_tokens || 600,
+      maxOutputTokens: request.max_tokens || 2000,
       topP: 0.8,
       topK: 40,
     };
 
+    console.log('⚙️ [GEMINI API] Configuração:', generationConfig);
+
     // Fazer a chamada à API
+    console.log('📡 [GEMINI API] Enviando requisição...');
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: promptToSend }] }],
       generationConfig,
@@ -87,6 +96,10 @@ export const geminiAPI = async (
 
     const response = result.response;
     const text = response.text();
+    
+    console.log('✅ [GEMINI API] Resposta recebida');
+    console.log('📤 [GEMINI API] Tamanho da resposta:', text.length, 'caracteres');
+    console.log('📝 [GEMINI API] Preview:', text.substring(0, 100) + '...');
 
     // Retornar no formato compatível
     return {
@@ -105,7 +118,10 @@ export const geminiAPI = async (
       ],
     };
   } catch (error: any) {
-    console.error('Gemini API error:', error);
+    console.error('❌ [GEMINI API] Erro ao processar requisição');
+    console.error('🔴 [GEMINI API] Tipo de erro:', error.name);
+    console.error('🔴 [GEMINI API] Mensagem:', error.message);
+    console.error('🔴 [GEMINI API] Stack:', error.stack?.substring(0, 200));
     
     // Tratamento de erros específicos
     if (error.message?.includes('API_KEY_INVALID') || error.message?.includes('API key')) {
@@ -114,6 +130,8 @@ export const geminiAPI = async (
       throw new Error('Limite de requisições excedido. Tente novamente mais tarde.');
     } else if (error.message?.includes('SAFETY')) {
       throw new Error('Conteúdo bloqueado por filtros de segurança.');
+    } else if (error.message?.includes('not found') || error.message?.includes('404')) {
+      throw new Error(`Modelo não encontrado. Verifique se sua API Key tem acesso ao gemini-2.5-flash. Erro: ${error.message}`);
     } else {
       throw new Error(`Erro ao chamar API do Gemini: ${error.message || 'Erro desconhecido'}`);
     }

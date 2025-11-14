@@ -9,7 +9,12 @@ const MessageList = () => {
   const { messages, isLoading } = useChat();
   const scrollViewRef = useRef<ScrollView>(null);
 
+  console.log('📜 [MESSAGELIST] Renderizando');
+  console.log('📊 [MESSAGELIST] Mensagens:', messages.length);
+  console.log('⏳ [MESSAGELIST] Loading:', isLoading);
+
   useEffect(() => {
+    console.log('📍 [MESSAGELIST] useEffect - scrollToEnd');
     scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages, isLoading]);
 
@@ -52,11 +57,11 @@ const MessageList = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: colors.background,
   },
   content: {
     padding: spacing.md,
+    flexGrow: 1,
   },
   emptyContainer: {
     flex: 1,
