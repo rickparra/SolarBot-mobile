@@ -823,9 +823,15 @@ Este projeto foi desenvolvido como parte do programa **SkillUpPlus** da **FIAP**
 
 ---
 
-## 👥 Autores
+## 👥 Equipe de Desenvolvimento
 
-Desenvolvido por alunos do programa SkillUpPlus - FIAP
+Este projeto é desenvolvido por estudantes da FIAP da **3ESPV**:
+
+- **Henrique Parra Benitez** - RM551973
+- **Roberto Oliveira Azzalin Navas** - RM551460
+- **Tony Willian da Silva Segalin** - RM550667
+
+*Programa SkillUpPlus - FIAP*
 
 ---
 
